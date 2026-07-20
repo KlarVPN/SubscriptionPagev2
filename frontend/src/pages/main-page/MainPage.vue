@@ -5,10 +5,11 @@ import { computed } from 'vue'
 
 import InstallationGuidePanel from '@/components/InstallationGuidePanel.vue'
 import LanguagePicker from '@/components/LanguagePicker.vue'
-import RawKeysPanel from '@/components/RawKeysPanel.vue'
 import SubscriptionInfoPanel from '@/components/SubscriptionInfoPanel.vue'
 import { useAppConfigStore } from '@/stores/app-config'
 import { useSubscriptionStore } from '@/stores/subscription'
+import { createQrCodeDataUrl } from '@/shared/utils/qr-code'
+import { useSubscriptionLink } from '@/composables/use-subscription-link'
 
 const appConfigStore = useAppConfigStore()
 const subscriptionStore = useSubscriptionStore()
@@ -19,6 +20,9 @@ const ready = computed(
     Boolean(appConfigStore.config) &&
     Boolean(subscriptionStore.subscription),
 )
+
+const { subscriptionUrl } = useSubscriptionLink()
+const qrCodeSrc = computed(() => createQrCodeDataUrl(subscriptionUrl.value))
 </script>
 
 <template>
@@ -36,7 +40,11 @@ const ready = computed(
         <main class="mx-auto w-full max-w-145 pb-8 pt-12 grid gap-4">
           <SubscriptionInfoPanel />
           <InstallationGuidePanel />
-          <RawKeysPanel />
+
+          <div class="flex flex-col items-center gap-4 mt-4">
+              <img class="rounded-2xl border-5 size-35" :src="qrCodeSrc" alt="QR code for subscription link" />
+              <span class="text-xs text-white/70">Подключаете другое устройство? Отсканируйте QR-код в приложении</span>
+          </div>
 
           <div class="flex justify-center pt-2 pb-1">
             <LanguagePicker />

@@ -28,14 +28,14 @@ const emit = defineEmits<{
     >
       <div
         v-if="open"
-        class="fixed inset-0 z-[200] grid place-items-center bg-[rgba(5,8,14,0.72)] p-4 backdrop-blur-[14px]"
+        class="fixed inset-0 z-[200] grid place-items-center bg-black/10 p-4 backdrop-blur-[14px]"
         role="dialog"
         aria-modal="true"
         :aria-label="props.title"
         @click.self="open = false"
       >
         <div
-          class="w-full max-w-[420px] rounded-[24px] border border-white/10 bg-[rgba(17,22,31,0.96)] p-4 shadow-[0_30px_80px_rgba(0,0,0,0.4)]"
+          class="w-full max-w-[420px] rounded-[24px] bg-neutral-950 p-4"
         >
           <div class="mb-4 flex items-start justify-between gap-4">
             <div>

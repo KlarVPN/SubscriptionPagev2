@@ -32,11 +32,11 @@ const gradient = computed(() =>
     : getColorGradient(props.block.svgIconColor),
 )
 
-const accordionShellClass = 'group overflow-hidden rounded-[20px] border border-white/10 bg-white/5'
+const accordionShellClass = 'group overflow-hidden rounded-[20px] bg-white/5'
 const summaryClass =
   'flex cursor-pointer list-none items-center gap-3 p-4 [&::-webkit-details-marker]:hidden'
 const bodyClass = 'px-4 pb-4'
-const cardBaseClass = 'rounded-[20px] border border-white/10 bg-white/5'
+const cardBaseClass = 'rounded-[20px] bg-white/5'
 const cardClass = computed(() => {
   if (props.variant === 'timeline') {
     return "relative p-4 pl-[1.1rem] before:absolute before:left-[1.85rem] before:top-[3.6rem] before:bottom-[-1rem] before:w-px before:bg-gradient-to-b before:from-cyan-400/50 before:to-cyan-400/5 before:content-['']"
@@ -58,7 +58,7 @@ const chevronClass =
 const descriptionClass = 'm-0 leading-[1.65] text-white/70'
 const buttonsClass = 'mt-4 flex flex-wrap gap-2.5'
 const buttonClass =
-  'inline-flex items-center gap-2 rounded-[14px] border border-white/10 bg-white/5 px-[0.88rem] py-[0.68rem] font-semibold text-white transition hover:-translate-y-px hover:border-cyan-400/30 hover:bg-white/10'
+  'inline-flex items-center gap-2 rounded-[14px] bg-white/5 px-[0.88rem] py-[0.68rem] font-semibold text-white transition hover:-translate-y-px hover:border-cyan-400/30 hover:bg-white/10'
 const buttonIconClass =
   'inline-flex h-4 w-4 shrink-0 items-center justify-center [&>svg]:h-[18px] [&>svg]:w-[18px]'
 </script>
@@ -71,8 +71,6 @@ const buttonIconClass =
           :class="badgeClass"
           :style="{
             background: gradient.background,
-            border: gradient.border,
-            boxShadow: gradient.boxShadow,
           }"
         >
           <span :class="iconClass" v-html="iconHtml" />
@@ -109,8 +107,6 @@ const buttonIconClass =
           :class="badgeClass"
           :style="{
             background: gradient.background,
-            border: gradient.border,
-            boxShadow: gradient.boxShadow,
           }"
         >
           <span :class="iconClass" v-html="iconHtml" />

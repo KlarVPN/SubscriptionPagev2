@@ -1,29 +1,22 @@
 <script setup lang="ts">
-import { Copy, QrCode } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { Copy } from 'lucide-vue-next'
+import { computed } from 'vue'
 import { toast } from 'vue-sonner'
 
 import { useTranslation } from '@/composables/use-translation'
 import { useSubscriptionLink } from '@/composables/use-subscription-link'
 import { copyText } from '@/shared/utils/clipboard'
-import { createQrCodeDataUrl } from '@/shared/utils/qr-code'
 import { vibrate } from '@/shared/utils/vibrate'
-import { useAppConfigStore } from '@/stores/app-config'
-import QrCodeModal from './QrCodeModal.vue'
 
-const appConfigStore = useAppConfigStore()
 const { subscriptionUrl } = useSubscriptionLink()
 const { t, baseTranslations } = useTranslation()
 
-const showQr = ref(false)
 
-const hideGetLink = computed(() => appConfigStore.config?.baseSettings.hideGetLinkButton ?? false)
 const subscriptionLinkValue = computed(() => subscriptionUrl.value)
 const copiedToastLabel = computed(
   () => t(baseTranslations.value?.linkCopiedToClipboard) || 'Link copied to clipboard',
 )
 
-const qrCodeSrc = computed(() => createQrCodeDataUrl(subscriptionUrl.value))
 
 async function copySubscriptionLink() {
   if (!subscriptionUrl.value) return
@@ -65,27 +58,6 @@ function handleSubscriptionLinkClick() {
       >
         <Copy class="h-4 w-4" />
       </button>
-
-      <button
-        v-if="!hideGetLink"
-        :disabled="!subscriptionLinkValue"
-        class="grid size-10.5 shrink-0 place-items-center rounded-lg  bg-white/10 text-white transition hover:bg-white/15 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-        type="button"
-        title="QR code"
-        @click="showQr = true"
-      >
-        <QrCode class="h-4 w-4" />
-      </button>
     </div>
   </article>
-
-  <QrCodeModal
-    v-model:open="showQr"
-    copy-label="Copy link"
-    description="Scan the code or copy the link."
-    image-alt="QR code for subscription link"
-    :image-src="qrCodeSrc"
-    title="Subscription link"
-    @copy="copySubscriptionLink"
-  />
 </template>

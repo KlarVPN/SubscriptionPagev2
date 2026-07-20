@@ -1,8 +1,8 @@
 import { renderSVG } from 'uqr'
 
 const QR_CODE_OPTIONS = {
-  whiteColor: '#161B22',
-  blackColor: '#22d3ee',
+  whiteColor: '#ffffff',
+  blackColor: '#000000',
 } as const
 
 export function createQrCodeDataUrl(content: string): string {

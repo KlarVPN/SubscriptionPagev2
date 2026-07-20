@@ -1,39 +1,93 @@
 <script setup lang="ts">
-import { Languages } from 'lucide-vue-next'
+import type { TSubscriptionPageLanguageCode } from '@remnawave/subscription-page-types'
+
+import { Check, ChevronDown, Languages } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
+import {
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectItemText,
+  SelectPortal,
+  SelectRoot,
+  SelectTrigger,
+  SelectValue,
+  SelectViewport,
+} from 'reka-ui'
 
 import { useAppConfigStore } from '@/stores/app-config'
 
 const appConfigStore = useAppConfigStore()
 const { currentLang, config } = storeToRefs(appConfigStore)
 
-const language = computed({
+const language = computed<TSubscriptionPageLanguageCode | undefined>({
   get: () => currentLang.value,
   set: (value) => {
-    appConfigStore.setLanguage(value)
+    if (value) {
+      appConfigStore.setLanguage(value)
+    }
   },
 })
 
 const locales = computed(() => config.value?.locales ?? [])
+
+function formatLanguageName(locale: TSubscriptionPageLanguageCode): string {
+  if (typeof Intl.DisplayNames !== 'undefined') {
+    const displayName = new Intl.DisplayNames([locale], { type: 'language' }).of(locale)
+
+    if (displayName) {
+      return displayName.charAt(0).toLocaleUpperCase(locale) + displayName.slice(1)
+    }
+  }
+
+  return locale.toUpperCase()
+}
+
+const languageOptions = computed(() =>
+  locales.value.map((locale) => ({
+    value: locale,
+    label: formatLanguageName(locale),
+  })),
+)
 </script>
 
 <template>
-  <div
-    class="inline-flex items-center gap-3 rounded-[18px] border border-white/10 bg-[rgba(17,22,31,0.72)] px-4 py-3 shadow-[0_18px_50px_rgba(0,0,0,0.18)]"
-  >
-    <Languages class="h-[18px] w-[18px] shrink-0 text-cyan-400" />
-
-    <label class="flex flex-col gap-1">
-      <span class="text-[0.72rem] uppercase tracking-[0.08em] text-white/60">Language</span>
-      <select
-        v-model="language"
-        class="min-w-[120px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-cyan-400/45 focus:ring-2 focus:ring-cyan-400/10 [&>option]:text-black"
+  <div v-if="languageOptions.length > 1" class="flex justify-center">
+    <SelectRoot v-model="language">
+      <SelectTrigger
+        aria-label="Select language"
+        class="inline-flex min-w-[200px] items-center gap-3 rounded-full  bg-neutral-900 px-4 py-3 text-sm font-medium text-white shadow-[0_20px_60px_rgba(0,0,0,0.28)] transition hover:border-cyan-400/30 hover:bg-white/10 focus:outline-none"
       >
-        <option v-for="locale in locales" :key="locale" :value="locale">
-          {{ locale.toUpperCase() }}
-        </option>
-      </select>
-    </label>
+        <Languages class="h-4 w-4 shrink-0 text-white" />
+        <SelectValue class="min-w-0 flex-1 truncate text-left" />
+        <ChevronDown class="h-4 w-4 shrink-0 text-white/50" />
+      </SelectTrigger>
+
+      <SelectPortal>
+        <SelectContent
+          class="z-50 overflow-hidden rounded-[18px] bg-neutral-900 mb-px p-2"
+          position="popper"
+          :side-offset="8"
+        >
+          <SelectViewport class="min-w-[var(--reka-select-trigger-width)] p-1">
+            <SelectItem
+              v-for="option in languageOptions"
+              :key="option.value"
+              :value="option.value"
+              class="flex cursor-pointer items-center gap-3 rounded-[14px] px-3 py-2 text-sm text-white outline-none transition data-[highlighted]:bg-white/10 data-[state=checked]:bg-neutral-400/10 data-[state=checked]:text-neutral-100"
+            >
+              <SelectItemText class="flex-1">
+                {{ option.label }}
+              </SelectItemText>
+
+              <SelectItemIndicator class="text-neutral-300">
+                <Check class="h-4 w-4" />
+              </SelectItemIndicator>
+            </SelectItem>
+          </SelectViewport>
+        </SelectContent>
+      </SelectPortal>
+    </SelectRoot>
   </div>
 </template>
