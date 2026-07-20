@@ -56,13 +56,9 @@ const qrCodeSrc = computed(() => createQrCodeDataUrl(subscriptionUrl.value))
 
       <div v-else class="grid min-h-[calc(100vh-80px)] place-items-center p-8" aria-live="polite">
         <div
-          class="flex items-center gap-3 rounded-[18px] border border-white/10 bg-[rgba(17,22,31,0.78)] px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.28)]"
+          class="flex items-center gap-3 px-5 py-4 "
         >
-          <LoaderCircle class="h-7 w-7 shrink-0 animate-spin text-cyan-400" />
-          <div>
-            <div class="font-semibold">{{ uiT('loadingSubscriptionPage') }}</div>
-            <div class="text-sm text-white/70">{{ uiT('preparingPreviewAndConfig') }}</div>
-          </div>
+          <LoaderCircle class="h-7 w-7 shrink-0 animate-spin text-white" />
         </div>
       </div>
     </div>
