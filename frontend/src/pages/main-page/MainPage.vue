@@ -24,7 +24,7 @@ const ready = computed(
   <div class="relative min-h-screen overflow-x-clip text-white p-4">
     <div class="pointer-events-none absolute inset-0 bg-black opacity-80" />
 
-    <div class="relative z-10 min-h-screen">
+    <div class="relative z-10">
       <template v-if="ready">
         <header class="flex min-w-0 w-full items-center justify-center gap-2 py-6">
             <KlarLogo class="size-12 shrink-0 p-1 object-contain" />
