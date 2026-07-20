@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import {
-    AlertCircle,
-    ArrowUpDown,
-    CalendarDays,
-    Check,
-    ChevronDown,
-    UserRound,
-    XCircle
+  AlertCircle,
+  ArrowUpDown,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  XCircle,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 
-import { formatDate } from '../shared/utils/config-parser'
-import { useTranslation } from '../composables/use-translation'
-import { useSubscriptionStore } from '../stores/subscription'
-import { useAppConfigStore } from '../stores/app-config'
-import { vibrate } from '../shared/utils/vibrate'
-import { cn } from '../lib/utils'
+import { useTranslation } from '@/composables/use-translation'
+import { cn } from '@/lib/utils'
+import { formatDate } from '@/shared/utils/config-parser'
+import { vibrate } from '@/shared/utils/vibrate'
+import { useAppConfigStore } from '@/stores/app-config'
+import { useSubscriptionStore } from '@/stores/subscription'
+import SubscriptionLinkAction from '@/components/SubscriptionLinkAction.vue'
 
 const appConfigStore = useAppConfigStore()
 const subscriptionStore = useSubscriptionStore()
@@ -28,75 +28,136 @@ const subscription = computed(() => subscriptionStore.subscription)
 const user = computed(() => subscription.value?.user)
 
 watch(
-    () => config.value?.uiConfig.subscriptionInfoBlockType,
-    (mode) => {
-        expanded.value = mode === 'expanded' || mode === 'cards'
-    },
-    { immediate: true }
+  () => config.value?.uiConfig.subscriptionInfoBlockType,
+  (mode) => {
+    expanded.value = mode === 'expanded' || mode === 'cards'
+  },
+  { immediate: true },
 )
 
 const mode = computed(() => config.value?.uiConfig.subscriptionInfoBlockType ?? 'hidden')
 
 const statusTone = computed(() => {
-    if (!user.value) return { color: 'red', icon: XCircle, label: t(baseTranslations.value?.inactive) }
-
-    if (user.value.userStatus === 'ACTIVE' && user.value.daysLeft >= 4) {
-        return { color: 'teal', icon: Check, label: t(baseTranslations.value?.active) }
-    }
-
-    if (user.value.userStatus === 'ACTIVE' && user.value.daysLeft >= 1) {
-        return { color: 'orange', icon: AlertCircle, label: t(baseTranslations.value?.active) }
-    }
-
+  if (!user.value)
     return { color: 'red', icon: XCircle, label: t(baseTranslations.value?.inactive) }
+
+  if (user.value.userStatus === 'ACTIVE' && user.value.daysLeft >= 4) {
+    return { color: 'teal', icon: Check, label: t(baseTranslations.value?.active) }
+  }
+
+  if (user.value.userStatus === 'ACTIVE' && user.value.daysLeft >= 1) {
+    return { color: 'orange', icon: AlertCircle, label: t(baseTranslations.value?.active) }
+  }
+
+  return { color: 'red', icon: XCircle, label: t(baseTranslations.value?.inactive) }
 })
 
 const statusCircleClass = computed(() => {
-    switch (statusTone.value.color) {
-        case 'orange':
-            return 'bg-amber-200'
-        case 'teal':
-            return 'bg-[#5db8a9]'
-        default:
-            return 'bg-rose-200'
-    }
+  switch (statusTone.value.color) {
+    case 'orange':
+      return 'bg-amber-200'
+    case 'teal':
+      return 'bg-[#5db8a9]'
+    default:
+      return 'bg-rose-200'
+  }
 })
 
-function getToneCardClass(color: string) {
-    switch (color) {
-        case 'blue':
-            return 'shadow-[inset_0_0_0_1px_rgba(34,139,230,0.08)]'
-        case 'cyan':
-            return 'shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)]'
-        case 'green':
-            return 'shadow-[inset_0_0_0_1px_rgba(64,192,87,0.08)]'
-        case 'orange':
-            return 'shadow-[inset_0_0_0_1px_rgba(253,126,20,0.08)]'
-        case 'red':
-            return 'shadow-[inset_0_0_0_1px_rgba(250,82,82,0.08)]'
-        case 'teal':
-            return 'shadow-[inset_0_0_0_1px_rgba(32,201,151,0.08)]'
-        case 'yellow':
-            return 'shadow-[inset_0_0_0_1px_rgba(250,176,5,0.08)]'
-        default:
-            return ''
+function formatDaysLeft(daysLeft: number): string {
+  if (daysLeft <= 0) {
+    return t(baseTranslations.value?.expired)
+  }
+
+  if (currentLang.value.startsWith('ru')) {
+    const rule = new Intl.PluralRules('ru').select(daysLeft)
+
+    switch (rule) {
+      case 'one':
+        return `${daysLeft} день остался`
+      case 'few':
+        return `${daysLeft} дня осталось`
+      default:
+        return `${daysLeft} дней осталось`
     }
+  }
+
+  return `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`
+}
+
+const expiresValue = computed(() => {
+  if (!user.value) return ''
+
+  return formatDaysLeft(user.value.daysLeft)
+})
+
+const expiresSubvalue = computed(() => {
+  if (!user.value || !baseTranslations.value) return ''
+
+  return formatDate(user.value.expiresAt, currentLang.value, baseTranslations.value)
+})
+
+function translateUsedWord(lang: string): string {
+  if (lang.startsWith('ru')) return 'использовано'
+  return 'used'
+}
+
+function translateTrafficProgressLabel(lang: string): string {
+  if (lang.startsWith('ru')) return 'Количество трафика'
+  return 'Traffic usage'
+}
+
+const usedLabel = computed(() => translateUsedWord(currentLang.value))
+const trafficProgressLabel = computed(() => translateTrafficProgressLabel(currentLang.value))
+
+const trafficProgress = computed(() => {
+  if (!user.value) return null
+
+  const usedBytes = Number(user.value.trafficUsedBytes ?? 0)
+  const limitBytes = Number(user.value.trafficLimitBytes ?? 0)
+  const unlimited = user.value.trafficLimit === '0' || limitBytes <= 0
+  const percent = unlimited ? 0 : Math.min(100, Math.round((usedBytes / limitBytes) * 100))
+
+  return {
+    percent,
+    usedLabel: user.value.trafficUsed,
+    limitLabel: unlimited ? '∞' : user.value.trafficLimit,
+    unlimited,
+  }
+})
+
+function toggleExpanded() {
+  vibrate('tap')
+  expanded.value = !expanded.value
 }
 
 const stats = computed(() => {
-    if (!user.value || !baseTranslations.value) return []
+  if (!user.value || !baseTranslations.value) return []
 
-    const bandwidthValue =
-        user.value.trafficLimit === '0'
-            ? `${user.value.trafficUsed} / ∞`
-            : `${user.value.trafficUsed} / ${user.value.trafficLimit}`
+  return [
+    {
+      icon: CalendarDays,
+      label: t(baseTranslations.value.expires),
+      value: expiresValue.value,
+      subvalue: expiresSubvalue.value,
+    },
+    {
+      icon: ArrowUpDown,
+      label: t(baseTranslations.value.bandwidth),
+      value: trafficProgress.value
+        ? `${trafficProgress.value.usedLabel} / ${trafficProgress.value.limitLabel}`
+        : '',
+      subvalue: trafficProgress.value ? `${trafficProgress.value.percent}% ${usedLabel.value}` : '',
+    },
+  ]
+})
 
-    return [
-        { color: 'blue', icon: UserRound, label: t(baseTranslations.value.name), value: user.value.username },
-        { color: statusTone.value.color, icon: statusTone.value.icon, label: t(baseTranslations.value.status), value: statusTone.value.label },
-        { color: 'orange', icon: CalendarDays, label: t(baseTranslations.value.expires), value: formatDate(user.value.expiresAt, currentLang.value, baseTranslations.value) },
-        { color: 'cyan', icon: ArrowUpDown, label: t(baseTranslations.value.bandwidth), value: bandwidthValue }
-    ].map((item) => ({ ...item, toneClass: getToneCardClass(item.color) }))
+const trafficBarClass = computed(() => {
+  if (!trafficProgress.value) return 'from-cyan-400 to-violet-500'
+
+  if (trafficProgress.value.percent < 40) return 'bg-emerald-500'
+  if (trafficProgress.value.percent <= 80) return 'bg-yellow-400'
+
+  return 'bg-rose-500'
 })
 </script>
 
@@ -106,22 +167,19 @@ const stats = computed(() => {
     class="rounded-[24px] bg-white/5 p-8 w-full"
   >
     <div class="flex flex-col items-center justify-center gap-4">
-        <div class="flex justify-center items-center gap-2">
-      <span :class="cn('size-3 rounded-full', statusCircleClass)" />
-      <h2 class="m-0 text-[1.15rem] mono uppercase font-semibold leading-[1.2]">
-        {{ user.username }}
-      </h2>
-        </div>
+      <div class="flex justify-center items-center gap-2">
+        <span :class="cn('size-3 rounded-full', statusCircleClass)" />
+        <h2 class="m-0 text-[1.15rem] mono uppercase font-semibold leading-[1.2]">
+          {{ user.username }}
+        </h2>
+      </div>
       <div class="flex min-w-0 items-center gap-3">
         <div
           class="flex flex-col mono items-center gap-3 rounded-full px-3 py-3 text-[0.75rem] font-bold uppercase tracking-[0.04em] whitespace-nowrap"
         >
-            <span :class="cn('p-4 rounded-full', statusCircleClass)">
-          <component
-            :is="statusTone.icon"
-            class="size-12 shrink-0 text-black"
-          />
-            </span>
+          <span :class="cn('p-4 rounded-full border-black', statusCircleClass)">
+            <component :is="statusTone.icon" class="size-12 shrink-0 text-black" />
+          </span>
           <span class="text-xl">{{ statusTone.label }}</span>
         </div>
       </div>
@@ -130,7 +188,7 @@ const stats = computed(() => {
         v-if="mode === 'collapsed'"
         class="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px] border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
         type="button"
-        @click="vibrate('tap'); expanded = !expanded"
+        @click="toggleExpanded"
       >
         <ChevronDown
           class="h-[18px] w-[18px] transition-transform duration-150"
@@ -147,31 +205,54 @@ const stats = computed(() => {
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 -translate-y-1"
     >
-      <div
-        v-if="mode !== 'collapsed' || expanded"
-        class="mt-4 grid gap-3 md:grid-cols-2"
-      >
+      <div v-if="mode !== 'collapsed' || expanded" class="mt-4 grid gap-3 md:grid-cols-2">
         <article
           v-for="item in stats"
           :key="item.label"
-          :class="['flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/5 p-[0.9rem]', item.toneClass]"
+          class="flex items-center gap-3 rounded-[12px] bg-black p-[0.9rem]"
         >
-          <div class="grid h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-white/5">
-            <component
-              :is="item.icon"
-              class="h-[18px] w-[18px]"
-            />
+          <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/10">
+            <component :is="item.icon" class="size-4.5" />
           </div>
 
           <div class="min-w-0">
-            <div class="text-[0.72rem] uppercase tracking-[0.08em] text-white/60">
+            <div class="text-[0.72rem] uppercase leading-none tracking-[0.08em] text-white/60">
               {{ item.label }}
             </div>
-            <div class="mt-1 truncate font-bold">
+            <div class="truncate font-bold">
               {{ item.value }}
+            </div>
+            <div
+              v-if="item.subvalue"
+              class="text-xs text-white/60 leading-none"
+            >
+              {{ item.subvalue }}
             </div>
           </div>
         </article>
+
+        <article class="md:col-span-2 rounded-[12px] bg-black p-[0.9rem]">
+          <div
+            class="h-2 overflow-hidden rounded-full bg-white/10"
+            role="progressbar"
+            :aria-valuenow="trafficProgress?.percent ?? 0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :aria-valuetext="`${trafficProgress?.percent ?? 0}% ${usedLabel}`"
+          >
+            <div
+              class="h-full rounded-full transition-all duration-300"
+              :class="trafficBarClass"
+              :style="{ width: `${trafficProgress?.percent ?? 0}%` }"
+            />
+          </div>
+
+          <div class="mt-2 flex items-center justify-between text-xs text-white/60">
+            <span>{{ trafficProgress?.unlimited ? 'Unlimited plan' : trafficProgressLabel }}</span>
+            <span>{{ trafficProgress?.percent ?? 0 }}%</span>
+          </div>
+        </article>
+        <SubscriptionLinkAction />
       </div>
     </Transition>
   </section>

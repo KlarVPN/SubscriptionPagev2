@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { Copy, KeyRound, QrCode, X } from 'lucide-vue-next'
+import { Copy, KeyRound, QrCode } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
-import { renderSVG } from 'uqr'
 
-import { useTranslation } from '../composables/use-translation'
-import { useSubscriptionStore } from '../stores/subscription'
-import { useAppConfigStore } from '../stores/app-config'
-import { vibrate } from '../shared/utils/vibrate'
+import { useTranslation } from '@/composables/use-translation'
+import { copyText } from '@/shared/utils/clipboard'
+import { createQrCodeDataUrl } from '@/shared/utils/qr-code'
+import { vibrate } from '@/shared/utils/vibrate'
+import { useAppConfigStore } from '@/stores/app-config'
+import { useSubscriptionStore } from '@/stores/subscription'
+import QrCodeModal from './QrCodeModal.vue'
 
 type ParsedLink = {
-    fullLink: string
-    name: string
+  fullLink: string
+  name: string
 }
 
 const appConfigStore = useAppConfigStore()
@@ -20,43 +22,47 @@ const { t, baseTranslations } = useTranslation()
 const selectedLink = ref<null | ParsedLink>(null)
 
 const parsedLinks = computed<ParsedLink[]>(() => {
-    const links = subscriptionStore.subscription?.links ?? []
+  const links = subscriptionStore.subscription?.links ?? []
 
-    return links.map((link) => {
-        const hashIndex = link.lastIndexOf('#')
+  return links.map((link) => {
+    const hashIndex = link.lastIndexOf('#')
 
-        if (hashIndex === -1) {
-            return { fullLink: link, name: 'Unknown' }
-        }
+    if (hashIndex === -1) {
+      return { fullLink: link, name: 'Unknown' }
+    }
 
-        const encodedName = link.slice(hashIndex + 1)
+    const encodedName = link.slice(hashIndex + 1)
 
-        try {
-            return {
-                fullLink: link,
-                name: decodeURIComponent(encodedName)
-            }
-        } catch {
-            return {
-                fullLink: link,
-                name: encodedName
-            }
-        }
-    })
+    try {
+      return {
+        fullLink: link,
+        name: decodeURIComponent(encodedName),
+      }
+    } catch {
+      return {
+        fullLink: link,
+        name: encodedName,
+      }
+    }
+  })
 })
 
 const qrSvg = computed(() => {
-    if (!selectedLink.value) return ''
+  if (!selectedLink.value) return ''
 
-    return renderSVG(selectedLink.value.fullLink, {
-        whiteColor: '#161B22',
-        blackColor: '#22d3ee'
-    })
+  return createQrCodeDataUrl(selectedLink.value.fullLink)
+})
+
+const isQrModalOpen = computed({
+  get: () => selectedLink.value !== null,
+  set: (isOpen) => {
+    if (!isOpen) selectedLink.value = null
+  },
 })
 
 async function copyLink(link: ParsedLink) {
-    vibrate('tap')
-    await navigator.clipboard?.writeText(link.fullLink)
+  vibrate('tap')
+  await copyText(link.fullLink)
 }
 </script>
 
@@ -70,9 +76,7 @@ async function copyLink(link: ParsedLink) {
         <h2 class="m-0 text-[1.05rem] font-semibold">
           {{ t(baseTranslations?.connectionKeysHeader) }}
         </h2>
-        <p class="m-0 mt-1 text-sm text-white/70">
-          Copy the raw links or scan them as QR codes.
-        </p>
+        <p class="m-0 mt-1 text-sm text-white/70">Copy the raw links or scan them as QR codes.</p>
       </div>
 
       <div
@@ -116,57 +120,14 @@ async function copyLink(link: ParsedLink) {
       </article>
     </div>
 
-    <Teleport to="body">
-      <Transition
-        enter-active-class="transition-opacity duration-150"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition-opacity duration-150"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
-        <div
-          v-if="selectedLink"
-          class="fixed inset-0 z-[200] grid place-items-center bg-[rgba(5,8,14,0.72)] p-4 backdrop-blur-[14px]"
-          @click.self="selectedLink = null"
-        >
-          <div class="w-full max-w-[420px] rounded-[24px] border border-white/10 bg-[rgba(17,22,31,0.96)] p-4 shadow-[0_30px_80px_rgba(0,0,0,0.4)]">
-            <div class="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <div class="text-base font-bold">
-                  {{ selectedLink.name }}
-                </div>
-                <div class="mt-1 text-sm text-white/70">
-                  Scan to import
-                </div>
-              </div>
-
-              <button
-                class="rounded-md p-1 text-white/80 transition hover:bg-white/5 hover:text-white"
-                type="button"
-                @click="selectedLink = null"
-              >
-                <X class="h-4 w-4" />
-              </button>
-            </div>
-
-            <img
-              v-if="qrSvg"
-              :alt="`${selectedLink.name} QR code`"
-              :src="`data:image/svg+xml;utf8,${encodeURIComponent(qrSvg)}`"
-              class="mb-4 w-full rounded-[18px] bg-white p-2"
-            >
-
-            <button
-              class="w-full rounded-[14px] border border-cyan-400/20 bg-gradient-to-br from-cyan-400/15 to-violet-500/10 px-4 py-[0.8rem] font-bold text-white"
-              type="button"
-              @click="copyLink(selectedLink)"
-            >
-              Copy link
-            </button>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
+    <QrCodeModal
+      v-model:open="isQrModalOpen"
+      copy-label="Copy link"
+      description="Scan to import"
+      :image-alt="selectedLink ? `${selectedLink.name} QR code` : 'QR code'"
+      :image-src="qrSvg"
+      :title="selectedLink?.name ?? 'Link'"
+      @copy="selectedLink && copyLink(selectedLink)"
+    />
   </section>
 </template>
