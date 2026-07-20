@@ -27,7 +27,7 @@ export const MOCK_APP_CONFIG = {
     hideGetLinkButton: false,
   },
   baseTranslations: {
-    installationGuideHeader: { en: 'Installation guide' },
+    installationGuideHeader: { en: 'Как подключиться' },
     connectionKeysHeader: { en: 'Connection keys' },
     linkCopied: { en: 'Link copied' },
     linkCopiedToClipboard: { en: 'The link has been copied to your clipboard' },

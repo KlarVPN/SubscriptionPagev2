@@ -13,7 +13,7 @@ const SHARED_ICON = `
 `
 
 const BASE_TRANSLATION_DEFAULTS = {
-  installationGuideHeader: 'Installation guide',
+  installationGuideHeader: 'Как подключиться',
   connectionKeysHeader: 'Connection keys',
   linkCopied: 'Link copied',
   linkCopiedToClipboard: 'The link has been copied to your clipboard',
