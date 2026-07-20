@@ -149,7 +149,7 @@ const trafficBarClass = computed(() => {
 <template>
   <section
     v-if="mode !== 'hidden' && user && baseTranslations"
-    class="rounded-[24px] bg-white/5 p-8 w-full"
+    class="w-full rounded-[24px] bg-white/5 p-3 sm:p-6"
   >
     <div class="flex flex-col items-center justify-center gap-4">
       <div class="flex justify-center items-center gap-2">
@@ -194,7 +194,7 @@ const trafficBarClass = computed(() => {
         <article
           v-for="item in stats"
           :key="item.label"
-          class="flex items-center gap-3 rounded-[12px] bg-black p-[0.9rem]"
+          class="flex min-w-0 items-center gap-3 rounded-[12px] bg-black p-[0.9rem]"
         >
           <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/10">
             <component :is="item.icon" class="size-4.5" />
@@ -216,7 +216,7 @@ const trafficBarClass = computed(() => {
           </div>
         </article>
 
-        <article v-if="!isExpired && trafficProgress" class="md:col-span-2 rounded-[12px] bg-black p-[0.9rem]">
+        <article v-if="!isExpired && trafficProgress" class="rounded-[12px] bg-black p-[0.9rem] md:col-span-2">
           <div
             class="h-2 overflow-hidden rounded-full bg-white/10"
             role="progressbar"

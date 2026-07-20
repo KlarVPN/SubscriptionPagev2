@@ -4,13 +4,14 @@ html,
 body,
 #root {
     min-height: 100%;
+    overflow-x: clip;
 }
 
 body {
     background-color: black;
     margin: 0;
+    width: 100%;
     color: #fafafa;
-    padding: 24px 16px;
     font-family:
         "Inter Tight",
         system-ui,

@@ -35,43 +35,15 @@ const emit = defineEmits<{
         @click.self="open = false"
       >
         <div
-          class="w-full max-w-[420px] rounded-[24px] bg-neutral-950 p-4"
+          class="w-fit rounded-[24px] bg-neutral-950 p-4"
         >
-          <div class="mb-4 flex items-start justify-between gap-4">
-            <div>
-              <div class="text-base font-bold">
-                {{ props.title }}
-              </div>
-              <div class="mt-1 text-sm text-white/70">
-                {{ props.description }}
-              </div>
-            </div>
-
-            <button
-              class="rounded-md p-1 text-white/80 transition hover:bg-white/5 hover:text-white"
-              type="button"
-              @click="open = false"
-            >
-              <X class="h-4 w-4" />
-            </button>
-          </div>
-
-          <div v-if="props.imageSrc" class="mb-4 grid place-items-center p-2">
+          <div v-if="props.imageSrc" class="grid place-items-center p-2 w-fit">
             <img
               :alt="props.imageAlt"
               :src="props.imageSrc"
-              class="w-full max-w-[280px] rounded-[18px] bg-white p-2"
+              class="w-full size-[280px] rounded-[18px] bg-white p-2"
             />
           </div>
-
-          <button
-            class="mt-1.5 flex w-full items-center justify-center gap-2 rounded-[14px] border border-cyan-400/20 bg-gradient-to-br from-cyan-400/15 to-violet-500/10 px-4 py-[0.8rem] font-bold text-white transition hover:-translate-y-0.5 hover:border-cyan-400/30 hover:bg-white/10"
-            type="button"
-            @click="emit('copy')"
-          >
-            <Copy class="h-4 w-4 shrink-0" />
-            <span>{{ props.copyLabel }}</span>
-          </button>
         </div>
       </div>
     </Transition>

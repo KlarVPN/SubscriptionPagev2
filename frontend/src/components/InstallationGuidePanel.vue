@@ -79,21 +79,21 @@ function getGroupDefinition(group: PlatformGroupKey): Omit<PlatformGroup, 'label
         key: group,
         icon: Smartphone,
         platformKeys: ['ios', 'android'],
-        columnsClass: 'sm:grid-cols-2',
+        columnsClass: 'grid-cols-2 sm:grid-cols-2',
       }
     case 'computers':
       return {
         key: group,
         icon: Monitor,
         platformKeys: ['windows', 'macos', 'linux'],
-        columnsClass: 'sm:grid-cols-3',
+        columnsClass: 'grid-cols-3 sm:grid-cols-3',
       }
     default:
       return {
         key: group,
         icon: Tv2,
         platformKeys: ['appleTV', 'androidTV'],
-        columnsClass: 'sm:grid-cols-2',
+        columnsClass: 'grid-cols-2 sm:grid-cols-2',
       }
   }
 }
@@ -211,35 +211,25 @@ function handleButtonClick(button: TSubscriptionPageButtonConfig) {
 <template>
   <section
     v-if="config && subscription && baseTranslations"
-    class="rounded-[24px] bg-white/5 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-6"
+    class="rounded-[24px] bg-white/5 p-3 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-6"
   >
-    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div class="max-w-[32rem]">
-        <h2 class="m-0 text-xl font-semibold leading-tight">
-          {{ t(baseTranslations.installationGuideHeader) }}
-        </h2>
-      </div>
-    </div>
-
-    <div class="grid gap-5">
+    <div class="grid gap-3">
       <section
         v-for="group in platformGroups"
         :key="group.key"
         class="grid gap-3"
       >
-        <div class="inline-flex items-center text-sm gap-2 font-semibold tracking-[0.08em] text-white/60">
-          <span class="grid place-items-center text-white/80">
-            <component :is="group.icon" class="h-4 w-4" />
-          </span>
-          <span>{{ group.label }}</span>
-        </div>
-
-        <div :class="['grid gap-3', group.columnsClass]">
+        <div
+          :class="[
+            'grid gap-3',
+            group.columnsClass,
+          ]"
+        >
           <button
             v-for="platform in group.platforms"
             :key="platform.value"
             :class="[
-              'group flex min-h-[148px] flex-col items-center justify-center rounded-[20px] bg-black px-4 py-5 text-center text-white  transition hover:bg-neutral-950',
+              'group flex min-h-[122px] flex-col items-center justify-center rounded-[20px] bg-black px-3 py-4 text-center text-white transition hover:bg-neutral-950 sm:min-h-[148px] sm:px-4 sm:py-5',
               selectedPlatform === platform.value
                 ? 'border-2 border-neutral-800'
                 : 'border-transparent',
@@ -249,15 +239,15 @@ function handleButtonClick(button: TSubscriptionPageButtonConfig) {
           >
             <span
               v-if="platform.iconHtml"
-              class="mb-4 inline-flex h-10 w-10 items-center justify-center text-white/55 transition group-hover:text-white/70 [&>svg]:h-10 [&>svg]:w-10"
+              class="mb-3 inline-flex h-9 w-9 items-center justify-center text-white/55 transition group-hover:text-white/70 sm:mb-4 sm:h-10 sm:w-10 [&>svg]:h-9 [&>svg]:w-9 sm:[&>svg]:h-10 sm:[&>svg]:w-10"
               v-html="platform.iconHtml"
             />
 
-            <span class="text-[1.02rem] font-semibold leading-none">
+            <span class="text-[0.92rem] font-semibold leading-tight sm:text-[1.02rem] sm:leading-none">
               {{ platform.title }}
             </span>
 
-            <span class="mt-1 text-sm text-white/45">
+            <span class="mt-1 text-[0.8rem] text-white/45 sm:text-sm">
               {{ platform.subtitle }}
             </span>
           </button>

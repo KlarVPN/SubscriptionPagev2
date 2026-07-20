@@ -59,7 +59,7 @@ const languageOptions = computed(() =>
     <SelectRoot v-model="language">
       <SelectTrigger
         :aria-label="uiT('selectLanguage')"
-        class="inline-flex min-w-[200px] items-center gap-3 rounded-full  bg-neutral-900 px-4 py-3 text-sm font-medium text-white shadow-[0_20px_60px_rgba(0,0,0,0.28)] transition hover:border-cyan-400/30 hover:bg-white/10 focus:outline-none"
+        class="inline-flex w-full max-w-[280px] items-center gap-3 rounded-full bg-neutral-900 px-4 py-3 text-sm font-medium text-white shadow-[0_20px_60px_rgba(0,0,0,0.28)] transition hover:border-cyan-400/30 hover:bg-white/10 focus:outline-none sm:w-auto sm:min-w-[200px]"
       >
         <Languages class="h-4 w-4 shrink-0 text-white" />
         <SelectValue class="min-w-0 flex-1 truncate text-left" />
@@ -68,11 +68,11 @@ const languageOptions = computed(() =>
 
       <SelectPortal>
         <SelectContent
-          class="z-50 overflow-hidden rounded-[18px] bg-neutral-900 mb-px p-2"
+          class="z-50 mb-px max-w-[calc(100vw-1rem)] overflow-hidden rounded-[18px] bg-neutral-900 p-2"
           position="popper"
           :side-offset="8"
         >
-          <SelectViewport class="min-w-[var(--reka-select-trigger-width)] p-1">
+          <SelectViewport class="min-w-0 max-w-[calc(100vw-1rem)] p-1">
             <SelectItem
               v-for="option in languageOptions"
               :key="option.value"

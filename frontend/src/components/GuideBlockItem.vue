@@ -106,16 +106,18 @@ const buttonIconClass =
 
     <div v-else :class="[cardBaseClass, cardClass]">
       <div :class="headClass">
-        <span
-          class="bg-white/10"
-          :class="badgeClass"
-        >
-          <span :class="iconClass" v-html="iconHtml" />
-        </span>
+        <div class="relative">
+            <span
+            class="bg-white/10"
+            :class="badgeClass"
+            >
+            <span :class="iconClass" v-html="iconHtml" />
+            </span>
+            <div class="absolute -bottom-1 -right-1 bg-black size-5 font-bold flex items-center justify-center rounded-full" :class="indexClass">{{ index + 1 }}</div>
+        </div>
 
         <div class="min-w-0">
           <div :class="titleClass" v-html="title" />
-          <div :class="indexClass">{{ uiT('step') }} {{ index + 1 }}</div>
         </div>
       </div>
 
