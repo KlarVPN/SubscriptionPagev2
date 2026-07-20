@@ -1,19 +1,18 @@
-FROM node:24.17-trixie-slim AS backend-build
+FROM oven/bun:1.3.14 AS backend-build
 WORKDIR /opt/app
 
-COPY backend/package*.json ./
+COPY backend/package.json ./
+COPY backend/bun.lock ./
 COPY backend/tsconfig.json ./
 COPY backend/tsconfig.build.json ./
 
-RUN npm ci
+RUN bun install --frozen-lockfile
 
 COPY backend/ .
 
-RUN npm run build
+RUN bun run build
 
-RUN npm cache clean --force 
-
-RUN npm prune --omit=dev
+RUN rm -rf node_modules && bun install --frozen-lockfile --production
 
 FROM node:24.17-trixie-slim
 WORKDIR /opt/app
@@ -29,12 +28,14 @@ LABEL org.opencontainers.image.documentation="https://docs.rw"
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
+ENV PATH="/opt/app/node_modules/.bin:${PATH}"
+
 COPY --from=backend-build /opt/app/dist ./dist
 COPY --from=backend-build /opt/app/node_modules ./node_modules
 
 COPY frontend/dist/ ./frontend/
 
-COPY backend/package*.json ./
+COPY backend/package.json ./
 
 
 COPY backend/ecosystem.config.js ./
@@ -42,8 +43,6 @@ COPY backend/docker-entrypoint.sh ./
 
 ENV PM2_DISABLE_VERSION_CHECK=true
 ENV NODE_OPTIONS="--max-old-space-size=16384"
-
-RUN npm install pm2 -g
 
 ENTRYPOINT [ "/bin/sh", "docker-entrypoint.sh" ]
 
