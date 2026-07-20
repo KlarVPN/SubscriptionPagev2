@@ -1,23 +1,29 @@
 <script setup lang="ts">
 import KlarLogo from '@/components/KlarLogo.vue'
-import { LoaderCircle } from 'lucide-vue-next'
+import { LifeBuoy, LoaderCircle } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 import InstallationGuidePanel from '@/components/InstallationGuidePanel.vue'
 import FaqPanel from '@/components/FaqPanel.vue'
 import LanguagePicker from '@/components/LanguagePicker.vue'
 import SubscriptionInfoPanel from '@/components/SubscriptionInfoPanel.vue'
+import { useTranslation } from '@/composables/use-translation'
 import { useAppConfigStore } from '@/stores/app-config'
 import { useSubscriptionStore } from '@/stores/subscription'
 
 const appConfigStore = useAppConfigStore()
 const subscriptionStore = useSubscriptionStore()
+const { uiT } = useTranslation()
 
 const ready = computed(
   () =>
     appConfigStore.isLoaded &&
     Boolean(appConfigStore.config) &&
     Boolean(subscriptionStore.subscription),
+)
+
+const supportUrl = computed(
+  () => appConfigStore.config?.brandingSettings?.supportUrl ?? '',
 )
 </script>
 
@@ -35,12 +41,22 @@ const ready = computed(
           <SubscriptionInfoPanel />
           <InstallationGuidePanel />
 
-          <div class="flex justify-center pt-2 pb-1">
+          <div class="flex flex-wrap items-center justify-center gap-3 pt-2 pb-1">
             <LanguagePicker />
           </div>
+
+            <a
+              v-if="supportUrl"
+              :href="supportUrl"
+              class="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-3.5 text-sm font-medium text-white transition hover:bg-white/15 focus:outline-none"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <LifeBuoy class="h-4 w-4 shrink-0" />
+              {{ uiT('support') }}
+            </a>
         </main>
       </template>
-          <FaqPanel />
 
       <div v-else class="grid min-h-[calc(100vh-80px)] place-items-center p-8" aria-live="polite">
         <div class="flex items-center gap-3 px-5 py-4">

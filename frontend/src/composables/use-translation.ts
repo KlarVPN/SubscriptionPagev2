@@ -18,6 +18,7 @@ type UiTextKey =
   | 'preparingPreviewAndConfig'
   | 'qrCode'
   | 'selectLanguage'
+  | 'support'
   | 'step'
   | 'subscriptionLink'
   | 'subscriptionQrCodeAlt'
@@ -105,6 +106,13 @@ const UI_TEXTS: Record<UiTextKey, Record<string, string>> = {
     fr: 'Choisir la langue',
     ru: 'Выберите язык',
     zh: '选择语言',
+  },
+  support: {
+    en: 'Support',
+    fa: 'پشتیبانی',
+    fr: 'Support',
+    ru: 'Поддержка',
+    zh: '支持',
   },
   step: {
     en: 'Step',
