@@ -1,16 +1,13 @@
-// import obfuscatorPlugin from 'vite-plugin-javascript-obfuscator'
-// import { visualizer } from 'rollup-plugin-visualizer'
-// import deadFile from 'vite-plugin-deadfile'
 import removeConsole from 'vite-plugin-remove-console'
 import webfontDownload from 'vite-plugin-webfont-dl'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
-import react from '@vitejs/plugin-react'
+import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
 import 'dotenv/config'
 
 export default defineConfig({
     plugins: [
-        react(),
+        vue(),
         removeConsole(),
         webfontDownload(undefined, {}),
         ViteEjsPlugin((viteConfig) => {
@@ -22,6 +19,7 @@ export default defineConfig({
                     metaTitle: '<%= metaTitle %>'
                 }
             }
+
             return {
                 root: viteConfig.root,
                 panelData: process.env.PANEL_DATA,
@@ -42,23 +40,19 @@ export default defineConfig({
                     groups: [
                         {
                             name: 'icons',
-                            test: /node_modules[\\/](react-icons|@tabler[\\/]icons-react)[\\/]/
+                            test: /node_modules\/lucide-vue-next\//
                         },
                         {
                             name: 'date',
-                            test: /node_modules[\\/]dayjs[\\/]/
+                            test: /node_modules\/dayjs\//
                         },
                         {
-                            name: 'react',
-                            test: /node_modules[\\/](react|zustand|react-dom|react-router|react-error-boundary)[\\/]/
-                        },
-                        {
-                            name: 'mantine',
-                            test: /node_modules[\\/]@mantine[\\/](core|hooks|nprogress|notifications|modals)[\\/]/
+                            name: 'vue',
+                            test: /node_modules\/(vue|vue-router|pinia)\//
                         },
                         {
                             name: 'i18n',
-                            test: /node_modules[\\/](i18next-browser-languagedetector|@remnawave[\\/](backend-contract|subscription-page-types))[\\/]/
+                            test: /node_modules\/(i18next-browser-languagedetector|@remnawave\/(backend-contract|subscription-page-types))\//
                         }
                     ]
                 }

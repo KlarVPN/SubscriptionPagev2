@@ -1,11 +1,12 @@
 import { fixupConfigRules, fixupPluginRules } from '@eslint/compat'
 import { defineConfig, globalIgnores } from 'eslint/config'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tsParser from '@typescript-eslint/parser'
 import stylistic from '@stylistic/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
 import { FlatCompat } from '@eslint/eslintrc'
 import _import from 'eslint-plugin-import'
+import vueParser from 'vue-eslint-parser'
 import { fileURLToPath } from 'node:url'
+import vue from 'eslint-plugin-vue'
 import globals from 'globals'
 import path from 'node:path'
 import js from '@eslint/js'
@@ -34,7 +35,6 @@ export default defineConfig([
                 'eslint:recommended',
                 'airbnb-base',
                 'plugin:@typescript-eslint/recommended',
-                'plugin:react-hooks/recommended',
                 'plugin:storybook/recommended',
                 'plugin:perfectionist/recommended-natural-legacy',
                 'prettier'
@@ -42,7 +42,6 @@ export default defineConfig([
         ),
 
         plugins: {
-            'react-refresh': reactRefresh,
             '@stylistic': stylistic,
             import: fixupPluginRules(_import)
         },
@@ -51,12 +50,13 @@ export default defineConfig([
             globals: {
                 ...globals.browser
             },
+
             parser: tsParser
         },
 
         settings: {
             'import/parsers': {
-                '@typescript-eslint/parser': ['.ts', '.tsx']
+                '@typescript-eslint/parser': ['.ts', '.vue']
             },
 
             'import/resolver': {
@@ -122,18 +122,13 @@ export default defineConfig([
             'max-classes-per-file': 'off',
             'import/no-extraneous-dependencies': ['off'],
             'import/no-unresolved': 'error',
+            'import/no-named-as-default': 'off',
+            'import/no-named-as-default-member': 'off',
             'import/prefer-default-export': 'off',
             'import/extensions': 'off',
             'no-bitwise': 'off',
             'no-plusplus': 'off',
             'no-restricted-syntax': ['off', 'ForInStatement'],
-
-            'react-refresh/only-export-components': [
-                'warn',
-                {
-                    allowConstantExport: true
-                }
-            ],
 
             'no-shadow': ['off'],
             'arrow-body-style': ['off'],
@@ -170,12 +165,63 @@ export default defineConfig([
                 }
             ],
 
-            'react-hooks/exhaustive-deps': 'off',
             'no-empty-pattern': 'warn',
 
             '@typescript-eslint/no-empty-object-type': 'off',
             '@typescript-eslint/no-unsafe-function-type': 'error',
             '@typescript-eslint/no-wrapper-object-types': 'error'
+        }
+    },
+    {
+        files: ['**/*.vue'],
+
+        extends: fixupConfigRules(vue.configs['flat/recommended']),
+
+        plugins: {
+            vue: fixupPluginRules(vue),
+            '@stylistic': stylistic,
+            import: fixupPluginRules(_import)
+        },
+
+        languageOptions: {
+            globals: {
+                ...globals.browser
+            },
+
+            parser: vueParser,
+
+            parserOptions: {
+                parser: tsParser,
+                extraFileExtensions: ['.vue']
+            }
+        },
+
+        settings: {
+            'import/parsers': {
+                '@typescript-eslint/parser': ['.ts', '.tsx', '.vue']
+            },
+
+            'import/resolver': {
+                node: true,
+
+                typescript: {
+                    project: '.'
+                }
+            }
+        },
+
+        rules: {
+            '@typescript-eslint/no-unused-vars': 'off',
+            'vue/valid-v-for': 'off',
+            'prefer-destructuring': 'off'
+        }
+    },
+    {
+        files: ['**/*.{ts,vue}'],
+
+        rules: {
+            'import/no-named-as-default': 'off',
+            'import/no-named-as-default-member': 'off'
         }
     }
 ])
