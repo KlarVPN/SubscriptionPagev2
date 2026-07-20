@@ -58,7 +58,6 @@ const UI_TEXTS: Record<UiTextKey, Record<string, string>> = {
     ru: 'Скопируйте сырые ссылки или отсканируйте их как QR-коды.',
     zh: '复制原始链接，或将其扫描为二维码。',
   },
-  daysLeft: {
   faqHeader: {
     en: 'Frequently asked questions',
     fa: 'سوالات متداول',
@@ -66,6 +65,7 @@ const UI_TEXTS: Record<UiTextKey, Record<string, string>> = {
     ru: 'Частые вопросы',
     zh: '常见问题',
   },
+  daysLeft: {
     en: '{count} day{suffix} left',
     fa: ' {count} روز باقی مانده',
     fr: '{count} jour{suffix} restant{suffix2}',

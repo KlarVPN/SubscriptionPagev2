@@ -40,10 +40,10 @@ const supportUrl = computed(
         <main class="mx-auto grid w-full max-w-145 gap-4">
           <SubscriptionInfoPanel />
           <InstallationGuidePanel />
+          <FaqPanel />
 
           <div class="flex flex-wrap items-center justify-center gap-3 pt-2 pb-1">
             <LanguagePicker />
-          </div>
 
             <a
               v-if="supportUrl"
@@ -55,6 +55,7 @@ const supportUrl = computed(
               <LifeBuoy class="h-4 w-4 shrink-0" />
               {{ uiT('support') }}
             </a>
+          </div>
         </main>
       </template>
 
