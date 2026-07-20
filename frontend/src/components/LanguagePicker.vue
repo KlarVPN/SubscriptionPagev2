@@ -16,9 +16,11 @@ import {
   SelectViewport,
 } from 'reka-ui'
 
+import { useTranslation } from '@/composables/use-translation'
 import { useAppConfigStore } from '@/stores/app-config'
 
 const appConfigStore = useAppConfigStore()
+const { uiT } = useTranslation()
 const { currentLang, config } = storeToRefs(appConfigStore)
 
 const language = computed<TSubscriptionPageLanguageCode | undefined>({
@@ -56,7 +58,7 @@ const languageOptions = computed(() =>
   <div v-if="languageOptions.length > 1" class="flex justify-center">
     <SelectRoot v-model="language">
       <SelectTrigger
-        aria-label="Select language"
+        :aria-label="uiT('selectLanguage')"
         class="inline-flex min-w-[200px] items-center gap-3 rounded-full  bg-neutral-900 px-4 py-3 text-sm font-medium text-white shadow-[0_20px_60px_rgba(0,0,0,0.28)] transition hover:border-cyan-400/30 hover:bg-white/10 focus:outline-none"
       >
         <Languages class="h-4 w-4 shrink-0 text-white" />

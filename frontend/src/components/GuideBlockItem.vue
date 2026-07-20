@@ -13,6 +13,7 @@ import {
   getColorGradientSolid,
   getLocalizedText,
 } from '../shared/utils/config-parser'
+import { useTranslation } from '@/composables/use-translation'
 
 const props = defineProps<{
   block: TSubscriptionPageAppConfig['blocks'][number]
@@ -22,6 +23,8 @@ const props = defineProps<{
   svgLibrary: Record<string, string>
   variant: 'accordion' | 'cards' | 'minimal' | 'timeline'
 }>()
+
+const { uiT } = useTranslation()
 
 const iconHtml = computed(() => props.svgLibrary[props.block.svgIconKey] ?? '')
 const title = computed(() => getLocalizedText(props.block.title, props.currentLang))
@@ -78,7 +81,7 @@ const buttonIconClass =
 
         <span class="min-w-0 flex-1">
           <span :class="titleClass" v-html="title" />
-          <span :class="indexClass">Step {{ index + 1 }}</span>
+          <span :class="indexClass">{{ uiT('step') }} {{ index + 1 }}</span>
         </span>
 
         <ChevronDown :class="chevronClass" />
@@ -104,17 +107,15 @@ const buttonIconClass =
     <div v-else :class="[cardBaseClass, cardClass]">
       <div :class="headClass">
         <span
+          class="bg-white/10"
           :class="badgeClass"
-          :style="{
-            background: gradient.background,
-          }"
         >
           <span :class="iconClass" v-html="iconHtml" />
         </span>
 
         <div class="min-w-0">
           <div :class="titleClass" v-html="title" />
-          <div :class="indexClass">Step {{ index + 1 }}</div>
+          <div :class="indexClass">{{ uiT('step') }} {{ index + 1 }}</div>
         </div>
       </div>
 

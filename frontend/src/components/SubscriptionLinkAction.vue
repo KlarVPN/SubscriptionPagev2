@@ -9,7 +9,7 @@ import { copyText } from '@/shared/utils/clipboard'
 import { vibrate } from '@/shared/utils/vibrate'
 
 const { subscriptionUrl } = useSubscriptionLink()
-const { t, baseTranslations } = useTranslation()
+const { t, baseTranslations, uiT } = useTranslation()
 
 
 const subscriptionLinkValue = computed(() => subscriptionUrl.value)
@@ -35,29 +35,30 @@ function handleSubscriptionLinkClick() {
 </script>
 
 <template>
-  <article class="md:col-span-2 rounded-[12px] bg-black p-[0.9rem]">
-    <span class="text-[0.72rem] uppercase leading-none tracking-[0.08em] text-white/60">
-      Ссылка на подписку
-    </span>
+  <article class="flex items-center md:col-span-2 rounded-[12px] bg-black p-[0.9rem]">
+    <div class="flex flex-1 flex-col gap-2">
+        <span class="text-[0.72rem] uppercase leading-none tracking-[0.08em] text-white/60">
+        {{ uiT('subscriptionLink') }}
+        </span>
 
-    <div class="flex items-center gap-2">
-      <input
-        :value="subscriptionLinkValue"
-        class="min-w-0 flex-1 p-0 text-sm text-white outline-none transition placeholder:text-white/35"
-        readonly
-        type="text"
-        @click="handleSubscriptionLinkClick"
-      >
-
-      <button
-        :disabled="!subscriptionLinkValue"
-        class="grid size-10.5 shrink-0 place-items-center rounded-lg  bg-white/10 text-white transition hover:bg-white/15 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-        type="button"
-        title="Copy"
-        @click="copySubscriptionLink"
-      >
-        <Copy class="h-4 w-4" />
-      </button>
+        <div class="flex items-center gap-2">
+            <input
+                :value="subscriptionLinkValue"
+                class="min-w-0 flex-1 p-0 text-sm text-white outline-none transition placeholder:text-white/35"
+                readonly
+                type="text"
+                @click="handleSubscriptionLinkClick"
+            >
+        </div>
     </div>
+    <button
+      :disabled="!subscriptionLinkValue"
+      class="grid size-10.5 shrink-0 place-items-center rounded-lg  bg-white/10 text-white transition hover:bg-white/15 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+      type="button"
+      :title="t(baseTranslations?.copyLink)"
+      @click="copySubscriptionLink"
+    >
+      <Copy class="h-4 w-4" />
+    </button>
   </article>
 </template>

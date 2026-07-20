@@ -5,11 +5,11 @@ import {
   CalendarDays,
   Check,
   ChevronDown,
-  XCircle,
+  XIcon,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 
-import { useTranslation } from '@/composables/use-translation'
+import { translateDaysLeft, useTranslation } from '@/composables/use-translation'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/shared/utils/config-parser'
 import { vibrate } from '@/shared/utils/vibrate'
@@ -19,13 +19,14 @@ import SubscriptionLinkAction from '@/components/SubscriptionLinkAction.vue'
 
 const appConfigStore = useAppConfigStore()
 const subscriptionStore = useSubscriptionStore()
-const { t, currentLang, baseTranslations } = useTranslation()
+const { t, currentLang, baseTranslations, uiT } = useTranslation()
 
 const expanded = ref(true)
 
 const config = computed(() => appConfigStore.config)
 const subscription = computed(() => subscriptionStore.subscription)
 const user = computed(() => subscription.value?.user)
+const isExpired = computed(() => Boolean(user.value && user.value.daysLeft <= 0))
 
 watch(
   () => config.value?.uiConfig.subscriptionInfoBlockType,
@@ -39,7 +40,7 @@ const mode = computed(() => config.value?.uiConfig.subscriptionInfoBlockType ?? 
 
 const statusTone = computed(() => {
   if (!user.value)
-    return { color: 'red', icon: XCircle, label: t(baseTranslations.value?.inactive) }
+    return { color: 'red', icon: XIcon, label: t(baseTranslations.value?.inactive) }
 
   if (user.value.userStatus === 'ACTIVE' && user.value.daysLeft >= 4) {
     return { color: 'teal', icon: Check, label: t(baseTranslations.value?.active) }
@@ -49,45 +50,28 @@ const statusTone = computed(() => {
     return { color: 'orange', icon: AlertCircle, label: t(baseTranslations.value?.active) }
   }
 
-  return { color: 'red', icon: XCircle, label: t(baseTranslations.value?.inactive) }
+  return { color: 'red', icon: XIcon, label: t(baseTranslations.value?.inactive) }
 })
 
 const statusCircleClass = computed(() => {
   switch (statusTone.value.color) {
     case 'orange':
-      return 'bg-amber-200'
+      return 'bg-[#f0b100]'
     case 'teal':
       return 'bg-[#5db8a9]'
     default:
-      return 'bg-rose-200'
+      return 'bg-[#e7000b]'
   }
 })
-
-function formatDaysLeft(daysLeft: number): string {
-  if (daysLeft <= 0) {
-    return t(baseTranslations.value?.expired)
-  }
-
-  if (currentLang.value.startsWith('ru')) {
-    const rule = new Intl.PluralRules('ru').select(daysLeft)
-
-    switch (rule) {
-      case 'one':
-        return `${daysLeft} день остался`
-      case 'few':
-        return `${daysLeft} дня осталось`
-      default:
-        return `${daysLeft} дней осталось`
-    }
-  }
-
-  return `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`
-}
 
 const expiresValue = computed(() => {
   if (!user.value) return ''
 
-  return formatDaysLeft(user.value.daysLeft)
+  if (user.value.daysLeft <= 0) {
+    return t(baseTranslations.value?.expired)
+  }
+
+  return translateDaysLeft(user.value.daysLeft, currentLang.value)
 })
 
 const expiresSubvalue = computed(() => {
@@ -96,18 +80,9 @@ const expiresSubvalue = computed(() => {
   return formatDate(user.value.expiresAt, currentLang.value, baseTranslations.value)
 })
 
-function translateUsedWord(lang: string): string {
-  if (lang.startsWith('ru')) return 'использовано'
-  return 'used'
-}
-
-function translateTrafficProgressLabel(lang: string): string {
-  if (lang.startsWith('ru')) return 'Количество трафика'
-  return 'Traffic usage'
-}
-
-const usedLabel = computed(() => translateUsedWord(currentLang.value))
-const trafficProgressLabel = computed(() => translateTrafficProgressLabel(currentLang.value))
+const usedLabel = computed(() => uiT('used'))
+const trafficProgressLabel = computed(() => uiT('trafficUsage'))
+const unlimitedPlanLabel = computed(() => uiT('unlimitedPlan'))
 
 const trafficProgress = computed(() => {
   if (!user.value) return null
@@ -123,6 +98,16 @@ const trafficProgress = computed(() => {
     limitLabel: unlimited ? '∞' : user.value.trafficLimit,
     unlimited,
   }
+})
+
+const trafficUsageSubvalue = computed(() => {
+  if (!trafficProgress.value) return ''
+
+  if (trafficProgress.value.unlimited) {
+    return uiT('infiniteTraffic')
+  }
+
+  return `${trafficProgress.value.percent}% ${usedLabel.value}`
 })
 
 function toggleExpanded() {
@@ -146,7 +131,7 @@ const stats = computed(() => {
       value: trafficProgress.value
         ? `${trafficProgress.value.usedLabel} / ${trafficProgress.value.limitLabel}`
         : '',
-      subvalue: trafficProgress.value ? `${trafficProgress.value.percent}% ${usedLabel.value}` : '',
+      subvalue: trafficUsageSubvalue.value,
     },
   ]
 })
@@ -231,7 +216,7 @@ const trafficBarClass = computed(() => {
           </div>
         </article>
 
-        <article class="md:col-span-2 rounded-[12px] bg-black p-[0.9rem]">
+        <article v-if="!isExpired && trafficProgress" class="md:col-span-2 rounded-[12px] bg-black p-[0.9rem]">
           <div
             class="h-2 overflow-hidden rounded-full bg-white/10"
             role="progressbar"
@@ -248,7 +233,7 @@ const trafficBarClass = computed(() => {
           </div>
 
           <div class="mt-2 flex items-center justify-between text-xs text-white/60">
-            <span>{{ trafficProgress?.unlimited ? 'Unlimited plan' : trafficProgressLabel }}</span>
+            <span>{{ trafficProgress?.unlimited ? unlimitedPlanLabel : trafficProgressLabel }}</span>
             <span>{{ trafficProgress?.percent ?? 0 }}%</span>
           </div>
         </article>

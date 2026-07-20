@@ -6,6 +6,7 @@ import { computed } from 'vue'
 import InstallationGuidePanel from '@/components/InstallationGuidePanel.vue'
 import LanguagePicker from '@/components/LanguagePicker.vue'
 import SubscriptionInfoPanel from '@/components/SubscriptionInfoPanel.vue'
+import { useTranslation } from '@/composables/use-translation'
 import { useAppConfigStore } from '@/stores/app-config'
 import { useSubscriptionStore } from '@/stores/subscription'
 import { createQrCodeDataUrl } from '@/shared/utils/qr-code'
@@ -22,6 +23,7 @@ const ready = computed(
 )
 
 const { subscriptionUrl } = useSubscriptionLink()
+const { uiT } = useTranslation()
 const qrCodeSrc = computed(() => createQrCodeDataUrl(subscriptionUrl.value))
 </script>
 
@@ -42,8 +44,8 @@ const qrCodeSrc = computed(() => createQrCodeDataUrl(subscriptionUrl.value))
           <InstallationGuidePanel />
 
           <div class="flex flex-col items-center gap-4 mt-4">
-              <img class="rounded-2xl border-5 size-35" :src="qrCodeSrc" alt="QR code for subscription link" />
-              <span class="text-xs text-white/70">Подключаете другое устройство? Отсканируйте QR-код в приложении</span>
+              <img class="rounded-2xl border-5 size-35" :src="qrCodeSrc" :alt="uiT('subscriptionQrCodeAlt')" />
+              <span class="text-xs text-white/70 text-center">{{ uiT('connectAnotherDevicePrompt') }}</span>
           </div>
 
           <div class="flex justify-center pt-2 pb-1">
@@ -58,8 +60,8 @@ const qrCodeSrc = computed(() => createQrCodeDataUrl(subscriptionUrl.value))
         >
           <LoaderCircle class="h-7 w-7 shrink-0 animate-spin text-cyan-400" />
           <div>
-            <div class="font-semibold">Loading subscription page</div>
-            <div class="text-sm text-white/70">Preparing the preview and config...</div>
+            <div class="font-semibold">{{ uiT('loadingSubscriptionPage') }}</div>
+            <div class="text-sm text-white/70">{{ uiT('preparingPreviewAndConfig') }}</div>
           </div>
         </div>
       </div>

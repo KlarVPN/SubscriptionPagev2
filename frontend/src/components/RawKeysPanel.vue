@@ -17,7 +17,7 @@ type ParsedLink = {
 
 const appConfigStore = useAppConfigStore()
 const subscriptionStore = useSubscriptionStore()
-const { t, baseTranslations } = useTranslation()
+const { t, baseTranslations, uiT } = useTranslation()
 
 const selectedLink = ref<null | ParsedLink>(null)
 
@@ -28,7 +28,7 @@ const parsedLinks = computed<ParsedLink[]>(() => {
     const hashIndex = link.lastIndexOf('#')
 
     if (hashIndex === -1) {
-      return { fullLink: link, name: 'Unknown' }
+      return { fullLink: link, name: t(baseTranslations.value?.unknown) }
     }
 
     const encodedName = link.slice(hashIndex + 1)
@@ -76,7 +76,7 @@ async function copyLink(link: ParsedLink) {
         <h2 class="m-0 text-[1.05rem] font-semibold">
           {{ t(baseTranslations?.connectionKeysHeader) }}
         </h2>
-        <p class="m-0 mt-1 text-sm text-white/70">Copy the raw links or scan them as QR codes.</p>
+        <p class="m-0 mt-1 text-sm text-white/70">{{ uiT('copyRawLinksOrScan') }}</p>
       </div>
 
       <div
@@ -122,11 +122,11 @@ async function copyLink(link: ParsedLink) {
 
     <QrCodeModal
       v-model:open="isQrModalOpen"
-      copy-label="Copy link"
-      description="Scan to import"
-      :image-alt="selectedLink ? `${selectedLink.name} QR code` : 'QR code'"
+      :copy-label="t(baseTranslations?.copyLink)"
+      :description="t(baseTranslations?.scanToImport)"
+      :image-alt="selectedLink ? `${selectedLink.name} ${uiT('qrCode')}` : uiT('qrCode')"
       :image-src="qrSvg"
-      :title="selectedLink?.name ?? 'Link'"
+      :title="selectedLink?.name ?? uiT('link')"
       @copy="selectedLink && copyLink(selectedLink)"
     />
   </section>

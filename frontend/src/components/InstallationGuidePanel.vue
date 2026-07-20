@@ -20,7 +20,7 @@ import GuideBlockItem from './GuideBlockItem.vue'
 
 const appConfigStore = useAppConfigStore()
 const subscriptionStore = useSubscriptionStore()
-const { t, currentLang, baseTranslations } = useTranslation()
+const { t, currentLang, baseTranslations, uiT } = useTranslation()
 const { config } = storeToRefs(appConfigStore)
 const { subscription } = storeToRefs(subscriptionStore)
 const { subscriptionUrl } = useSubscriptionLink()
@@ -60,24 +60,13 @@ type PlatformGroup = {
 }
 
 function getPlatformGroupLabel(group: PlatformGroupKey): string {
-  if (currentLang.value.startsWith('ru')) {
-    switch (group) {
-      case 'phones':
-        return 'Телефон'
-      case 'computers':
-        return 'Компьютер'
-      default:
-        return 'Телевизоры'
-    }
-  }
-
   switch (group) {
     case 'phones':
-      return 'Phones'
+      return uiT('phonesGroup')
     case 'computers':
-      return 'Computers'
+      return uiT('computersGroup')
     default:
-      return 'TVs'
+      return uiT('tvsGroup')
   }
 }
 
@@ -250,10 +239,10 @@ function handleButtonClick(button: TSubscriptionPageButtonConfig) {
             v-for="platform in group.platforms"
             :key="platform.value"
             :class="[
-              'group flex min-h-[148px] flex-col items-center justify-center rounded-[20px] bg-black px-4 py-5 text-center text-white transition hover:bg-neutral-950',
+              'group flex min-h-[148px] flex-col items-center justify-center rounded-[20px] bg-black px-4 py-5 text-center text-white  transition hover:bg-neutral-950',
               selectedPlatform === platform.value
-                ? 'bg-neutral-900'
-                : '',
+                ? 'border-2 border-neutral-800'
+                : 'border-transparent',
             ]"
             type="button"
             @click="handlePlatformClick(platform.value)"
