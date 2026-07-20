@@ -218,7 +218,7 @@ For complex slot styling, unscoped styles may be cleaner:
 .article-card h1,
 .article-card h2,
 .article-card h3 {
-  font-family: Georgia, serif;
+    font-family: "Inter Tight", serif;
   line-height: 1.2;
 }
 
