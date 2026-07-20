@@ -11,6 +11,7 @@ type UiTextKey =
   | 'computersGroup'
   | 'connectAnotherDevicePrompt'
   | 'copyRawLinksOrScan'
+  | 'faqHeader'
   | 'daysLeft'
   | 'loadingSubscriptionPage'
   | 'phonesGroup'
@@ -57,6 +58,13 @@ const UI_TEXTS: Record<UiTextKey, Record<string, string>> = {
     zh: '复制原始链接，或将其扫描为二维码。',
   },
   daysLeft: {
+  faqHeader: {
+    en: 'Frequently asked questions',
+    fa: 'سوالات متداول',
+    fr: 'Questions fréquentes',
+    ru: 'Частые вопросы',
+    zh: '常见问题',
+  },
     en: '{count} day{suffix} left',
     fa: ' {count} روز باقی مانده',
     fr: '{count} jour{suffix} restant{suffix2}',

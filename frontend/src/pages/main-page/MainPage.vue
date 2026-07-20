@@ -4,6 +4,7 @@ import { LoaderCircle } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 import InstallationGuidePanel from '@/components/InstallationGuidePanel.vue'
+import FaqPanel from '@/components/FaqPanel.vue'
 import LanguagePicker from '@/components/LanguagePicker.vue'
 import SubscriptionInfoPanel from '@/components/SubscriptionInfoPanel.vue'
 import { useAppConfigStore } from '@/stores/app-config'
@@ -39,6 +40,7 @@ const ready = computed(
           </div>
         </main>
       </template>
+          <FaqPanel />
 
       <div v-else class="grid min-h-[calc(100vh-80px)] place-items-center p-8" aria-live="polite">
         <div class="flex items-center gap-3 px-5 py-4">
