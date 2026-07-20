@@ -1,12 +1,14 @@
 import removeConsole from 'vite-plugin-remove-console'
 import webfontDownload from 'vite-plugin-webfont-dl'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
 import 'dotenv/config'
 
 export default defineConfig({
     plugins: [
+        tailwindcss(),
         vue(),
         removeConsole(),
         webfontDownload(undefined, {}),

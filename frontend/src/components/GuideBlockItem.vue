@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TSubscriptionPageAppConfig, TSubscriptionPageButtonConfig, TSubscriptionPageLanguageCode } from '@remnawave/subscription-page-types'
 
-import { ChevronDown, Copy, ExternalLink, QrCode } from 'lucide-vue-next'
+import { ChevronDown } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 import { getColorGradient, getColorGradientSolid, getLocalizedText } from '../shared/utils/config-parser'
@@ -23,18 +23,44 @@ const gradient = computed(() =>
         ? getColorGradientSolid(props.block.svgIconColor)
         : getColorGradient(props.block.svgIconColor)
 )
+
+const accordionShellClass = 'group overflow-hidden rounded-[20px] border border-white/10 bg-white/5'
+const summaryClass = 'flex cursor-pointer list-none items-center gap-3 p-4 [&::-webkit-details-marker]:hidden'
+const bodyClass = 'px-4 pb-4'
+const cardBaseClass = 'rounded-[20px] border border-white/10 bg-white/5'
+const cardClass = computed(() => {
+    if (props.variant === 'timeline') {
+        return "relative p-4 pl-[1.1rem] before:absolute before:left-[1.85rem] before:top-[3.6rem] before:bottom-[-1rem] before:w-px before:bg-gradient-to-b before:from-cyan-400/50 before:to-cyan-400/5 before:content-['']"
+    }
+
+    if (props.variant === 'minimal') {
+        return 'p-[0.9rem]'
+    }
+
+    return 'p-4'
+})
+const headClass = 'mb-3 flex items-center gap-3'
+const badgeClass = 'grid h-[42px] w-[42px] shrink-0 place-items-center rounded-[14px]'
+const iconClass = 'inline-flex items-center justify-center [&>svg]:h-[18px] [&>svg]:w-[18px]'
+const titleClass = 'text-base font-bold'
+const indexClass = 'mt-1 text-[0.75rem] uppercase tracking-[0.08em] text-white/60'
+const chevronClass = 'h-[18px] w-[18px] shrink-0 text-white/70 transition-transform duration-150 group-open:rotate-180'
+const descriptionClass = 'm-0 leading-[1.65] text-white/70'
+const buttonsClass = 'mt-4 flex flex-wrap gap-2.5'
+const buttonClass = 'inline-flex items-center gap-2 rounded-[14px] border border-white/10 bg-white/5 px-[0.88rem] py-[0.68rem] font-semibold text-white transition hover:-translate-y-px hover:border-cyan-400/30 hover:bg-white/10'
+const buttonIconClass = 'inline-flex h-4 w-4 shrink-0 items-center justify-center [&>svg]:h-[18px] [&>svg]:w-[18px]'
 </script>
 
 <template>
-  <article :class="['guide-block', `guide-block--${variant}`]">
+  <article class="relative">
     <details
       v-if="variant === 'accordion'"
-      class="guide-details"
+      :class="accordionShellClass"
       :open="index === 0"
     >
-      <summary class="guide-summary">
+      <summary :class="summaryClass">
         <span
-          class="guide-badge"
+          :class="badgeClass"
           :style="{
             background: gradient.background,
             border: gradient.border,
@@ -42,40 +68,40 @@ const gradient = computed(() =>
           }"
         >
           <span
-            class="guide-badge-icon"
+            :class="iconClass"
             v-html="iconHtml"
           />
         </span>
 
-        <span class="guide-summary-copy">
+        <span class="min-w-0 flex-1">
           <span
-            class="guide-title"
+            :class="titleClass"
             v-html="title"
           />
-          <span class="guide-index">Step {{ index + 1 }}</span>
+          <span :class="indexClass">Step {{ index + 1 }}</span>
         </span>
 
-        <ChevronDown class="guide-chevron" />
+        <ChevronDown :class="chevronClass" />
       </summary>
 
-      <div class="guide-body">
+      <div :class="bodyClass">
         <p
-          class="guide-description"
+          :class="descriptionClass"
           v-html="description"
         />
         <div
           v-if="block.buttons.length"
-          class="guide-buttons"
+          :class="buttonsClass"
         >
           <button
             v-for="button in block.buttons"
             :key="`${button.svgIconKey}-${button.link}`"
-            class="guide-button"
+            :class="buttonClass"
             type="button"
             @click="onButtonClick(button)"
           >
             <span
-              class="guide-button-icon"
+              :class="buttonIconClass"
               v-html="svgLibrary[button.svgIconKey] ?? ''"
             />
             <span v-html="getLocalizedText(button.text, currentLang)" />
@@ -86,11 +112,11 @@ const gradient = computed(() =>
 
     <div
       v-else
-      class="guide-card"
+      :class="[cardBaseClass, cardClass]"
     >
-      <div class="guide-head">
+      <div :class="headClass">
         <span
-          class="guide-badge"
+          :class="badgeClass"
           :style="{
             background: gradient.background,
             border: gradient.border,
@@ -98,40 +124,40 @@ const gradient = computed(() =>
           }"
         >
           <span
-            class="guide-badge-icon"
+            :class="iconClass"
             v-html="iconHtml"
           />
         </span>
 
-        <div class="guide-summary-copy">
+        <div class="min-w-0">
           <div
-            class="guide-title"
+            :class="titleClass"
             v-html="title"
           />
-          <div class="guide-index">
+          <div :class="indexClass">
             Step {{ index + 1 }}
           </div>
         </div>
       </div>
 
       <p
-        class="guide-description"
+        :class="descriptionClass"
         v-html="description"
       />
 
       <div
         v-if="block.buttons.length"
-        class="guide-buttons"
+        :class="buttonsClass"
       >
         <button
           v-for="button in block.buttons"
           :key="`${button.svgIconKey}-${button.link}`"
-          class="guide-button"
+          :class="buttonClass"
           type="button"
           @click="onButtonClick(button)"
         >
           <span
-            class="guide-button-icon"
+            :class="buttonIconClass"
             v-html="svgLibrary[button.svgIconKey] ?? ''"
           />
           <span v-html="getLocalizedText(button.text, currentLang)" />
@@ -140,168 +166,3 @@ const gradient = computed(() =>
     </div>
   </article>
 </template>
-
-<style scoped>
-.guide-block {
-    position: relative;
-}
-
-.guide-card,
-.guide-details {
-    padding: 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.guide-details {
-    padding: 0;
-    overflow: hidden;
-}
-
-.guide-summary {
-    list-style: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    padding: 1rem;
-}
-
-.guide-summary::-webkit-details-marker {
-    display: none;
-}
-
-.guide-head {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    margin-bottom: 0.75rem;
-}
-
-.guide-badge {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    flex: 0 0 auto;
-}
-
-.guide-badge-icon,
-.guide-button-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.guide-badge-icon :deep(svg),
-.guide-button-icon :deep(svg) {
-    width: 18px;
-    height: 18px;
-}
-
-.guide-summary-copy {
-    min-width: 0;
-    flex: 1;
-}
-
-.guide-title {
-    font-weight: 700;
-    font-size: 1rem;
-}
-
-.guide-index {
-    margin-top: 0.15rem;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.62);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-
-.guide-chevron {
-    width: 18px;
-    height: 18px;
-    color: rgba(255, 255, 255, 0.72);
-    transition: transform 140ms ease;
-}
-
-.guide-details[open] .guide-chevron {
-    transform: rotate(180deg);
-}
-
-.guide-body {
-    padding: 0 1rem 1rem;
-}
-
-.guide-description {
-    margin: 0;
-    color: rgba(255, 255, 255, 0.72);
-    line-height: 1.65;
-}
-
-.guide-buttons {
-    margin-top: 0.9rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-}
-
-.guide-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.68rem 0.88rem;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-        transform 120ms ease,
-        border-color 120ms ease,
-        background 120ms ease;
-}
-
-.guide-button:hover {
-    transform: translateY(-1px);
-    border-color: rgba(34, 211, 238, 0.28);
-    background: rgba(255, 255, 255, 0.06);
-}
-
-.guide-button-icon {
-    width: 16px;
-    height: 16px;
-    flex: 0 0 auto;
-}
-
-.guide-block--minimal .guide-card,
-.guide-block--minimal .guide-details {
-    padding: 0.9rem;
-}
-
-.guide-block--timeline .guide-card,
-.guide-block--timeline .guide-details {
-    padding-left: 1.1rem;
-    position: relative;
-}
-
-.guide-block--timeline .guide-card::before,
-.guide-block--timeline .guide-details::before {
-    content: '';
-    position: absolute;
-    left: 1.85rem;
-    top: 3.6rem;
-    bottom: -1rem;
-    width: 2px;
-    background: linear-gradient(to bottom, rgba(34, 211, 238, 0.5), rgba(34, 211, 238, 0.05));
-}
-
-@media (max-width: 640px) {
-    .guide-button {
-        width: 100%;
-        justify-content: center;
-    }
-}
-</style>

@@ -17,14 +17,14 @@ const locales = computed(() => appConfigStore.config?.locales ?? [])
 </script>
 
 <template>
-  <div class="language-picker">
-    <Languages class="language-icon" />
+  <div class="inline-flex items-center gap-3 rounded-[18px] border border-white/10 bg-[rgba(17,22,31,0.72)] px-4 py-3 shadow-[0_18px_50px_rgba(0,0,0,0.18)]">
+    <Languages class="h-[18px] w-[18px] shrink-0 text-cyan-400" />
 
-    <label class="language-select-wrap">
-      <span class="language-label">Language</span>
+    <label class="flex flex-col gap-1">
+      <span class="text-[0.72rem] uppercase tracking-[0.08em] text-white/60">Language</span>
       <select
         v-model="language"
-        class="language-select"
+        class="min-w-[120px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-cyan-400/45 focus:ring-2 focus:ring-cyan-400/10 [&>option]:text-black"
       >
         <option
           v-for="locale in locales"
@@ -37,51 +37,3 @@ const locales = computed(() => appConfigStore.config?.locales ?? [])
     </label>
   </div>
 </template>
-
-<style scoped>
-.language-picker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 0.9rem;
-    border-radius: 18px;
-    background: rgba(17, 22, 31, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
-}
-
-.language-icon {
-    width: 18px;
-    height: 18px;
-    color: #22d3ee;
-    flex: 0 0 auto;
-}
-
-.language-select-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.language-label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.58);
-}
-
-.language-select {
-    background: rgba(255, 255, 255, 0.03);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 0.5rem 0.75rem;
-    min-width: 120px;
-    outline: none;
-}
-
-.language-select:focus {
-    border-color: rgba(34, 211, 238, 0.45);
-    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
-}
-</style>

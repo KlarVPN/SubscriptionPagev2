@@ -63,83 +63,90 @@ async function copyLink(link: ParsedLink) {
 <template>
   <section
     v-if="appConfigStore.config?.baseSettings.showConnectionKeys !== false && parsedLinks.length"
-    class="panel"
+    class="rounded-[24px] border border-white/10 bg-[rgba(17,22,31,0.78)] p-4 shadow-[0_22px_70px_rgba(0,0,0,0.24)]"
   >
-    <div class="panel-head">
+    <div class="mb-4 flex items-start justify-between gap-4">
       <div>
-        <h2 class="panel-title">
+        <h2 class="m-0 text-[1.05rem] font-semibold">
           {{ t(baseTranslations?.connectionKeysHeader) }}
         </h2>
-        <p class="panel-subtitle">
+        <p class="m-0 mt-1 text-sm text-white/70">
           Copy the raw links or scan them as QR codes.
         </p>
       </div>
 
       <div
         v-if="parsedLinks.length > 1"
-        class="count-chip"
+        class="grid h-[34px] min-w-[34px] place-items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 font-bold text-cyan-200"
       >
         {{ parsedLinks.length }}
       </div>
     </div>
 
-    <div class="link-list">
+    <div class="grid gap-3">
       <article
         v-for="link in parsedLinks"
         :key="link.fullLink"
-        class="link-row"
+        class="flex flex-col gap-3 rounded-[18px] border border-white/10 bg-white/5 px-[0.95rem] py-[0.85rem] sm:flex-row sm:items-center sm:justify-between"
       >
-        <div class="link-meta">
-          <KeyRound class="link-icon" />
-          <div class="link-name">
+        <div class="flex min-w-0 items-center gap-3">
+          <KeyRound class="h-[18px] w-[18px] shrink-0 text-cyan-400" />
+          <div class="truncate font-semibold">
             {{ link.name }}
           </div>
         </div>
 
-        <div class="link-actions">
+        <div class="flex shrink-0 items-center gap-2 sm:justify-end">
           <button
-            class="mini-button"
+            class="grid h-9 w-9 place-items-center rounded-[14px] border border-white/10 bg-white/5 text-white transition hover:-translate-y-0.5 hover:border-cyan-400/30 hover:bg-white/10"
             type="button"
             @click="copyLink(link)"
           >
-            <Copy class="mini-button-icon" />
+            <Copy class="h-4 w-4" />
           </button>
 
           <button
-            class="mini-button mini-button--accent"
+            class="grid h-9 w-9 place-items-center rounded-[14px] border border-cyan-400/20 bg-white/5 text-white transition hover:-translate-y-0.5 hover:border-cyan-400/30 hover:bg-white/10"
             type="button"
             @click="selectedLink = link"
           >
-            <QrCode class="mini-button-icon" />
+            <QrCode class="h-4 w-4" />
           </button>
         </div>
       </article>
     </div>
 
     <Teleport to="body">
-      <Transition name="fade">
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
         <div
           v-if="selectedLink"
-          class="modal-backdrop"
+          class="fixed inset-0 z-[200] grid place-items-center bg-[rgba(5,8,14,0.72)] p-4 backdrop-blur-[14px]"
           @click.self="selectedLink = null"
         >
-          <div class="modal-card">
-            <div class="modal-head">
+          <div class="w-full max-w-[420px] rounded-[24px] border border-white/10 bg-[rgba(17,22,31,0.96)] p-4 shadow-[0_30px_80px_rgba(0,0,0,0.4)]">
+            <div class="mb-4 flex items-start justify-between gap-4">
               <div>
-                <div class="modal-title">
+                <div class="text-base font-bold">
                   {{ selectedLink.name }}
                 </div>
-                <div class="modal-subtitle">
+                <div class="mt-1 text-sm text-white/70">
                   Scan to import
                 </div>
               </div>
 
               <button
-                class="modal-close"
+                class="rounded-md p-1 text-white/80 transition hover:bg-white/5 hover:text-white"
                 type="button"
                 @click="selectedLink = null"
               >
-                <X class="mini-button-icon" />
+                <X class="h-4 w-4" />
               </button>
             </div>
 
@@ -147,11 +154,11 @@ async function copyLink(link: ParsedLink) {
               v-if="qrSvg"
               :alt="`${selectedLink.name} QR code`"
               :src="`data:image/svg+xml;utf8,${encodeURIComponent(qrSvg)}`"
-              class="qr-code"
+              class="mb-4 w-full rounded-[18px] bg-white p-2"
             >
 
             <button
-              class="copy-full"
+              class="w-full rounded-[14px] border border-cyan-400/20 bg-gradient-to-br from-cyan-400/15 to-violet-500/10 px-4 py-[0.8rem] font-bold text-white"
               type="button"
               @click="copyLink(selectedLink)"
             >
@@ -163,196 +170,3 @@ async function copyLink(link: ParsedLink) {
     </Teleport>
   </section>
 </template>
-
-<style scoped>
-.panel {
-    padding: 1rem;
-    border-radius: 24px;
-    background: rgba(17, 22, 31, 0.78);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24);
-}
-
-.panel-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.panel-title {
-    margin: 0;
-    font-size: 1.05rem;
-}
-
-.panel-subtitle {
-    margin: 0.2rem 0 0;
-    color: rgba(255, 255, 255, 0.68);
-    font-size: 0.875rem;
-}
-
-.count-chip {
-    min-width: 34px;
-    height: 34px;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    padding: 0 0.6rem;
-    background: rgba(34, 211, 238, 0.12);
-    border: 1px solid rgba(34, 211, 238, 0.22);
-    color: #67e8f9;
-    font-weight: 700;
-}
-
-.link-list {
-    display: grid;
-    gap: 0.75rem;
-}
-
-.link-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.85rem;
-    padding: 0.85rem 0.95rem;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.link-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-width: 0;
-}
-
-.link-icon {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 auto;
-    color: #22d3ee;
-}
-
-.link-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 600;
-}
-
-.link-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex: 0 0 auto;
-}
-
-.mini-button {
-    width: 38px;
-    height: 38px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
-    color: #fff;
-    display: grid;
-    place-items: center;
-}
-
-.mini-button--accent {
-    border-color: rgba(34, 211, 238, 0.22);
-}
-
-.mini-button-icon {
-    width: 16px;
-    height: 16px;
-}
-
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    display: grid;
-    place-items: center;
-    padding: 1rem;
-    background: rgba(5, 8, 14, 0.72);
-    backdrop-filter: blur(14px);
-}
-
-.modal-card {
-    width: min(420px, 100%);
-    border-radius: 24px;
-    background: rgba(17, 22, 31, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-    padding: 1rem;
-}
-
-.modal-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.modal-title {
-    font-size: 1rem;
-    font-weight: 700;
-}
-
-.modal-subtitle {
-    margin-top: 0.25rem;
-    color: rgba(255, 255, 255, 0.68);
-    font-size: 0.875rem;
-}
-
-.modal-close {
-    border: 0;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.78);
-    cursor: pointer;
-    padding: 0.25rem;
-}
-
-.qr-code {
-    width: 100%;
-    border-radius: 18px;
-    background: #fff;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.copy-full {
-    width: 100%;
-    border-radius: 14px;
-    border: 1px solid rgba(34, 211, 238, 0.22);
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.14), rgba(151, 117, 250, 0.12));
-    color: #fff;
-    padding: 0.8rem 1rem;
-    font-weight: 700;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 160ms ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
-@media (max-width: 640px) {
-    .panel-head,
-    .link-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .link-actions {
-        justify-content: flex-end;
-    }
-}
-</style>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { TSubscriptionPageAppConfig, TSubscriptionPageButtonConfig, TSubscriptionPagePlatformKey } from '@remnawave/subscription-page-types'
 
-import { ChevronDown } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 
 import { constructSubscriptionUrl } from '../shared/utils/construct-subscription-url'
@@ -108,29 +107,29 @@ function handleButtonClick(button: TSubscriptionPageButtonConfig) {
 <template>
   <section
     v-if="config && subscription && baseTranslations && selectedPlatformConfig && selectedApp"
-    class="panel"
+    class="rounded-[24px] border border-white/10 bg-[rgba(17,22,31,0.78)] p-4 shadow-[0_22px_70px_rgba(0,0,0,0.24)]"
   >
-    <div class="panel-head">
+    <div class="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row">
       <div>
-        <h2 class="panel-title">
+        <h2 class="m-0 text-[1.05rem] font-semibold">
           {{ t(baseTranslations.installationGuideHeader) }}
         </h2>
-        <p class="panel-subtitle">
+        <p class="m-0 mt-1 text-sm text-white/70">
           Choose your device and follow the steps.
         </p>
       </div>
 
       <label
         v-if="availablePlatforms.length > 1"
-        class="platform-select"
+        class="inline-flex w-full items-center gap-2 rounded-[14px] border border-white/10 bg-white/5 px-3 py-2 sm:w-auto"
       >
         <span
-          class="platform-select-icon"
+          class="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center [&>svg]:h-[18px] [&>svg]:w-[18px]"
           v-html="selectedPlatformConfig ? config.svgLibrary[selectedPlatformConfig.svgIconKey] ?? '' : ''"
         />
         <select
           v-model="selectedPlatform"
-          class="platform-select-input"
+          class="w-full min-w-[150px] bg-transparent text-white outline-none [&>option]:text-black"
         >
           <option
             v-for="platform in availablePlatforms"
@@ -143,28 +142,32 @@ function handleButtonClick(button: TSubscriptionPageButtonConfig) {
       </label>
     </div>
 
-    <div class="app-strip">
+    <div class="mb-4 flex gap-2.5 overflow-x-auto pb-1">
       <button
         v-for="(app, index) in selectedPlatformConfig.apps"
         :key="app.name"
-        :class="['app-chip', { 'app-chip--active': index === selectedAppIndex, 'app-chip--featured': app.featured }]"
+        :class="[
+          'inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-[16px] border border-white/10 bg-white/5 px-4 py-[0.72rem] text-white transition hover:-translate-y-0.5 hover:border-cyan-400/30 hover:bg-white/10',
+          index === selectedAppIndex ? 'border-cyan-400/30 bg-gradient-to-br from-cyan-400/15 to-violet-500/10' : '',
+          app.featured ? 'shadow-[inset_0_0_0_1px_rgba(250,176,5,0.1)]' : ''
+        ]"
         type="button"
         @click="vibrate('toggle'); selectedAppIndex = index"
       >
         <span
           v-if="app.svgIconKey"
-          class="app-chip-icon"
+          class="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center [&>svg]:h-[18px] [&>svg]:w-[18px]"
           v-html="config.svgLibrary[app.svgIconKey] ?? ''"
         />
         <span>{{ app.name }}</span>
         <span
           v-if="app.featured"
-          class="app-chip-badge"
+          class="rounded-full bg-amber-500/15 px-1.5 py-[0.18rem] text-[0.7rem] font-bold text-amber-300"
         >Featured</span>
       </button>
     </div>
 
-    <div class="guide-list">
+    <div class="grid gap-3">
       <GuideBlockItem
         v-for="(block, index) in selectedApp.blocks"
         :key="`${selectedApp.name}-${index}`"
@@ -178,137 +181,3 @@ function handleButtonClick(button: TSubscriptionPageButtonConfig) {
     </div>
   </section>
 </template>
-
-<style scoped>
-.panel {
-    padding: 1rem;
-    border-radius: 24px;
-    background: rgba(17, 22, 31, 0.78);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24);
-}
-
-.panel-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.panel-title {
-    margin: 0;
-    font-size: 1.05rem;
-}
-
-.panel-subtitle {
-    margin: 0.2rem 0 0;
-    color: rgba(255, 255, 255, 0.68);
-    font-size: 0.875rem;
-}
-
-.platform-select {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.7rem;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.platform-select-icon {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 auto;
-    display: inline-flex;
-}
-
-.platform-select-icon :deep(svg) {
-    width: 18px;
-    height: 18px;
-}
-
-.platform-select-input {
-    background: transparent;
-    color: #fff;
-    border: 0;
-    outline: none;
-    min-width: 150px;
-}
-
-.platform-select-input option {
-    color: #000;
-}
-
-.app-strip {
-    display: flex;
-    gap: 0.65rem;
-    overflow-x: auto;
-    padding-bottom: 0.2rem;
-    margin-bottom: 1rem;
-}
-
-.app-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.72rem 0.9rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
-    color: #fff;
-    cursor: pointer;
-    white-space: nowrap;
-    flex: 0 0 auto;
-}
-
-.app-chip--active {
-    border-color: rgba(34, 211, 238, 0.3);
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.14), rgba(151, 117, 250, 0.1));
-}
-
-.app-chip--featured {
-    box-shadow: inset 0 0 0 1px rgba(250, 176, 5, 0.1);
-}
-
-.app-chip-icon {
-    width: 18px;
-    height: 18px;
-    display: inline-flex;
-    flex: 0 0 auto;
-}
-
-.app-chip-icon :deep(svg) {
-    width: 18px;
-    height: 18px;
-}
-
-.app-chip-badge {
-    padding: 0.18rem 0.45rem;
-    border-radius: 999px;
-    background: rgba(250, 176, 5, 0.16);
-    color: #fbbf24;
-    font-size: 0.7rem;
-    font-weight: 700;
-}
-
-.guide-list {
-    display: grid;
-    gap: 0.75rem;
-}
-
-@media (max-width: 640px) {
-    .panel-head {
-        flex-direction: column;
-    }
-
-    .platform-select {
-        width: 100%;
-    }
-
-    .platform-select-input {
-        width: 100%;
-    }
-}
-</style>
