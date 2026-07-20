@@ -8,6 +8,7 @@ import {
   XIcon,
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
+import { ProgressIndicator, ProgressRoot } from 'reka-ui'
 
 import { translateDaysLeft, useTranslation } from '@/composables/use-translation'
 import { cn } from '@/lib/utils'
@@ -144,6 +145,22 @@ const trafficBarClass = computed(() => {
 
   return 'bg-rose-500'
 })
+
+const trafficProgressLabelText = computed(() => {
+  if (!trafficProgress.value) return ''
+
+  return trafficProgress.value.unlimited
+    ? unlimitedPlanLabel.value
+    : `${trafficProgress.value.percent}% ${usedLabel.value}`
+})
+
+function getTrafficProgressText() {
+  return trafficProgressLabelText.value
+}
+
+const showTrafficProgressBar = computed(
+  () => Boolean(trafficProgress.value) && !isExpired.value && !trafficProgress.value?.unlimited,
+)
 </script>
 
 <template>
@@ -216,21 +233,19 @@ const trafficBarClass = computed(() => {
           </div>
         </article>
 
-        <article v-if="!isExpired && trafficProgress" class="rounded-[12px] bg-black p-[0.9rem] md:col-span-2">
-          <div
+        <article v-if="showTrafficProgressBar" class="rounded-[12px] bg-black p-[0.9rem] md:col-span-2">
+          <ProgressRoot
             class="h-2 overflow-hidden rounded-full bg-white/10"
-            role="progressbar"
-            :aria-valuenow="trafficProgress?.percent ?? 0"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            :aria-valuetext="`${trafficProgress?.percent ?? 0}% ${usedLabel}`"
+            :get-value-text="getTrafficProgressText"
+            :model-value="trafficProgress?.percent ?? 0"
+            :max="100"
           >
-            <div
+            <ProgressIndicator
               class="h-full rounded-full transition-all duration-300"
               :class="trafficBarClass"
               :style="{ width: `${trafficProgress?.percent ?? 0}%` }"
             />
-          </div>
+          </ProgressRoot>
 
           <div class="mt-2 flex items-center justify-between text-xs text-white/60">
             <span>{{ trafficProgress?.unlimited ? unlimitedPlanLabel : trafficProgressLabel }}</span>
